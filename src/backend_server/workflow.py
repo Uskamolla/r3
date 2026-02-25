@@ -14,7 +14,7 @@ from docx import Document
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-from src.backend_server.models import (
+from src.backend_server.model import (
     Analyst,
     Perspectives,
     GenerateAnalystsState,
@@ -84,4 +84,8 @@ class AutonomousReportGenerator:
 if __name__ == "__main__":
         """_summary_
         """
-        pass
+        llm = ModelLoader().load_llm()
+        print(llm.invoke("hii").content)
+        
+        reporter = AutonomousReportGenerator()
+        reporter.build_graph()
