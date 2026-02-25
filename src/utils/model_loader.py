@@ -10,9 +10,9 @@ from src.logger import GLOBAL_LOGGER as log
 from src.exception.custom_exception import ResearchAnalystException
 import asyncio
 
-
 class ApiKeyManager:
     def __init__(self):
+        load_dotenv()
         # Read all API keys from your .env file into a dict
         # os.getenv returns None if a key is missing — we handle that below
         self.api_keys = {
