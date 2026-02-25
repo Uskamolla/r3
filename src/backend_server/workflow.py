@@ -27,7 +27,7 @@ from src.backend_server.model import (
 from src.utils.model_loader import ModelLoader
 
 from src.utils.model_loader import ModelLoader
-from src.prompt_lib.prompts import *
+from src.prompt_lib.prompt import *
 
 def build_interview_graph(llm,tavily_search=None):
 
@@ -152,7 +152,7 @@ class AutonomousReportGenerator:
         max_analysts = state["max_analysts"]
         human_analyst_feedback = state.get("human_analyst_feedback","")
         
-        structured_llm = llm.with_structured_output(Perspectives)
+        structured_llm = self.llm.with_structured_output(Perspectives)
         
         system_messages = CREATE_ANALYSTS_PROMPT.format(
             topic=topic,
@@ -161,7 +161,8 @@ class AutonomousReportGenerator:
             
             )
         analysts = structured_llm.invoke([SystemMessage(content=system_messages)]+ [HumanMessage(content="Generate the set of analysts.")])
-    
+        return {"analysts": analysts.analysts}
+
     def human_feedback(self):
         """_summary_
         """
@@ -189,8 +190,8 @@ class AutonomousReportGenerator:
         
         # Summarize the sections into a final report
         
-        instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=topic, formatted_str_sections=formatted_str_sections)    
-        intro = llm.invoke([instructions]+[HumanMessage(content=f"Write the report introduction")]) 
+        instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=state["topic"], formatted_str_sections=formatted_str_sections)    
+        intro = self.llm.invoke([instructions]+[HumanMessage(content=f"Write the report introduction")]) 
         return {"introduction": intro.content}
     
     def write_conclusion(self, state:ResearchGraphState):
@@ -205,7 +206,7 @@ class AutonomousReportGenerator:
         # Summarize the sections into a final report
         
         instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=topic, formatted_str_sections=formatted_str_sections)    
-        conclusion = llm.invoke([instructions]+[HumanMessage(content=f"Write the report conclusion")]) 
+        conclusion = self.llm.invoke([instructions]+[HumanMessage(content=f"Write the report conclusion")]) 
         return {"conclusion": conclusion.content}
     
     def finalize_report(self, state:ResearchGraphState):
@@ -354,14 +355,13 @@ if __name__ == "__main__":
         # print(llm.invoke("hii").content)
         
         reporter = AutonomousReportGenerator(llm)
-        reporter.build_graph()
         graph = reporter.build_graph()
         
-        topic = ""
+        topic = "Use of multi agent AI framework in industry and how pratical it is?"
         
         thread = {"configurable": {"thread_id": "1"}}
         
-        for _ in graph.stream({"topic": topic, "max_analysts": 3}, thread, stream_mode="values"):
+        for _ in graph.stream({"topic": topic, "max_analysts": 1}, thread, stream_mode="values"):
             """_summary_
             """
             pass

@@ -5,20 +5,16 @@ CREATE_ANALYSTS_PROMPT = """You are tasked with creating a set of AI analyst per
 
 1. First, review the research topic:
 {topic}
-
-2. Examine the analysts available from earlier conversations.{analysts}.
-Modify them if needed.
-
-3. Examine any editorial feedback that has been optionally provided to guide creation of the analysts: 
+        
+2. Examine any editorial feedback that has been optionally provided to guide creation of the analysts: 
+        
 {human_analyst_feedback}
+    
+3. Determine the most interesting themes based upon documents and / or feedback above.
+                    
+4. Pick the top {max_analysts} themes.
 
-4. Determine the most interesting themes based upon documents and / or feedback above.
-
-5. Pick the top {max_analysts} themes.
-
-6. Assign one analyst to each theme.
-
-Provide output in this format strictly : {format_instructions}"""
+5. Assign one analyst to each theme."""
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Prompt for Analyst to Ask Questions
@@ -46,18 +42,10 @@ Refer to the expert as expert, he doesn't have a name."""
 # Prompt to Generate Search Query from Conversation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 GENERATE_SEARCH_QUERY = """You will be given a conversation between an analyst and an expert. 
-
-Your goal is to generate a well-structured query for use in retrieval and / or web-search related to the conversation.
-
+Your goal is to generate a well-structured query for use in retrieval and / or web-search related to the conversation. 
 First, analyze the full conversation.
-
 Pay particular attention to the final question posed by the analyst.
-
-Convert this final question into a well-structured web search query
-
-conversation: {conversation}
-
-provide output strictly in this format: {format_instructions}"""
+Convert this final question into a well-structured web search query"""
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Prompt for Expert to Generate Answers
