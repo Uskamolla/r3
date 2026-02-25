@@ -183,36 +183,112 @@ class AutonomousReportGenerator:
         return {"content": report.content}
             
     def write_introduction(self,state:ResearchGraphState):
-        topic = state["topic"]
-        intro = self.llm.invoke([
-            SystemMessage(content=f"Write a 100-word markdown introduction for {topic}.")
-        ])
+
+        sections = state["sections"]
+        formatted_str_sections = "\n\n".join([f"{section}" for section in sections])
+        
+        # Summarize the sections into a final report
+        
+        instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=topic, formatted_str_sections=formatted_str_sections)    
+        intro = llm.invoke([instructions]+[HumanMessage(content=f"Write the report introduction")]) 
         return {"introduction": intro.content}
     
     def write_conclusion(self, state:ResearchGraphState):
         """_summary_
         """
-        pass
+        sections = state["sections"]
+        topic = state["topic"]
+
+        # Concat all sections together
+        formatted_str_sections = "\n\n".join([f"{section}" for section in sections])
+        
+        # Summarize the sections into a final report
+        
+        instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=topic, formatted_str_sections=formatted_str_sections)    
+        conclusion = llm.invoke([instructions]+[HumanMessage(content=f"Write the report conclusion")]) 
+        return {"conclusion": conclusion.content}
     
     def finalize_report(self, state:ResearchGraphState):
         """_summary_
         """
-        pass
+        content = state["content"]
+        if content.startswith("## Insights"):
+            content = content.strip("## Insights")
+        if "## Sources" in content:
+            try:
+                content, sources = content.split("\n## Sources\n")
+            except Exception as e:
+                sources = None
+        else:
+            sources = None
+
+        final_report = state["introduction"] + "\n\n---\n\n" + content + "\n\n---\n\n" + state["conclusion"]
+        if sources is not None:
+            final_report += "\n\n## Sources\n" + sources
+        return {"final_report": final_report}
     
     def save_report(self, final_report: str, topic: str, format: str = "docx", save_dir: str = None):
         """_summary_
         """
-        pass
+        import re
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Sanitize topic for Windows file system
+        safe_topic = re.sub(r'[\\/*?:"<>|]', "_", topic)
+        filename = f"{safe_topic.replace(' ', '_')}_{timestamp}.{format}"
+        
+        if save_dir is None:
+            save_dir =  os.path.join(os.getcwd(),"generated_report")
+        os.makedirs(save_dir,exist_ok=True)
+        file_path = os.path.join(save_dir,filename)
+        
+        if format == "docx":
+            self._save_as_docx(final_report, file_path)
+            
+        elif format == "pdf":
+            self._save_as_pdf(final_report,file_path)
+            
+        else:
+            raise ValueError("Invalid format. Use 'docx' or 'pdf'.")
+        
+        print(f"Report Saved: {file_path}")
+        return file_path
     
-    def _save_as_docx(self, text:str,file_path:str):
-        """'_summary_'
-        """
-        pass
-    
-    def _save_as_pdf(self, text:str,file_path:str):
-        """_summary_
-        """
-        pass
+    def _save_as_docx(self, text: str, file_path: str):
+        doc = Document()
+        for line in text.split("\n"):
+            if line.startswith("# "):
+                doc.add_heading(line[2:], level=1)
+            elif line.startswith("## "):
+                doc.add_heading(line[3:], level=2)
+            elif line.startswith("### "):
+                doc.add_heading(line[4:], level=3)
+            else:
+                doc.add_paragraph(line)
+        doc.save(file_path)
+
+    def _save_as_pdf(self, text: str, file_path: str):
+        c = canvas.Canvas(file_path, pagesize=letter)
+        width, height = letter
+        x, y = 50, height - 50
+        for line in text.split("\n"):
+            if not line.strip():
+                y -= 15
+                continue
+            if y < 50:
+                c.showPage()
+                y = height - 50
+            if line.startswith("# "):
+                c.setFont("Helvetica-Bold", 14)
+                line = line[2:]
+            elif line.startswith("## "):
+                c.setFont("Helvetica-Bold", 12)
+                line = line[3:]
+            else:
+                c.setFont("Helvetica", 10)
+            c.drawString(x, y, line.strip())
+            y -= 15
+        c.save()
     
     def build_graph(self):
         """_summary_
