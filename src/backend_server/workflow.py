@@ -73,6 +73,20 @@ def build_interview_graph(llm,tavily_search=None):
         pass
 
     builder = StateGraph(InterviewState)
+    builder.add_node("ask_question", generation_question)
+    builder.add_node("search_web", search_web)
+    builder.add_node("generate_answer", generate_answer)
+    builder.add_node("save_interview", save_interview)
+    builder.add_node("write_section", write_section)
+
+    builder.add_edge(START, "ask_question")
+    builder.add_edge("ask_question", "search_web")
+    builder.add_edge("search_web", "generate_answer")
+    builder.add_edge("generate_answer", "save_interview")
+    builder.add_edge("save_interview", "write_section")
+    builder.add_edge("write_section", END)
+
+    return builder.compile(checkpointer=memory)
 
 
 class AutonomousReportGenerator:
@@ -176,8 +190,32 @@ class AutonomousReportGenerator:
             ]
 
 
+        builder = StateGraph(ResearchGraphState)
+        # Add nodes
         builder.add_node("create_analyst", self.create_analyst)
         builder.add_node("human_feedback", self.human_feedback)
+        builder.add_node("conduct_interview", interview_graph)
+        builder.add_node("write_report", self.write_report)
+        builder.add_node("write_introduction", self.write_introduction)
+        builder.add_node("write_conclusion", self.write_conclusion)
+        builder.add_node("finalize_report", self.finalize_report)
+
+        # Edges
+        builder.add_edge(START, "create_analyst")
+        builder.add_edge("create_analyst", "human_feedback")
+
+        # Map each analyst → interview graph
+        builder.add_conditional_edges("human_feedback", initiate_all_interviews, ["conduct_interview"])
+
+        builder.add_edge("conduct_interview", "write_report")
+        builder.add_edge("conduct_interview", "write_introduction")
+        builder.add_edge("conduct_interview", "write_conclusion")
+        builder.add_edge(
+            ["write_report", "write_introduction", "write_conclusion"], "finalize_report"
+        )
+        builder.add_edge("finalize_report", END)
+
+        return builder.compile(interrupt_before=["human_feedback"], checkpointer=self.memory)
     
 if __name__ == "__main__":
         """_summary_
@@ -216,4 +254,3 @@ if __name__ == "__main__":
         else:
             print("No Report Content Generated")
 
-            
