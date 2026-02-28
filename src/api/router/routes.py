@@ -104,9 +104,9 @@ async def dashboard(request: Request):
 # Returns a progress page where the user can track and provide feedback.
 # Example: User submits topic="AI in Healthcare" -> report generation begins.
 @router.post("/generate_report", response_class=HTMLResponse)
-async def generate_report(request: Request, topic: str = Form(...)):
+async def generate_report(request: Request, topic: str = Form(...), max_analysts: int = Form(1)):
     service = ReportService()
-    result = service.start_report_generation(topic, 3)
+    result = service.start_report_generation(topic, max_analysts)
     # thread_id uniquely identifies this report generation session for feedback/status tracking.
     thread_id = result["thread_id"]
 

@@ -44,6 +44,10 @@
     <form id="generateForm" action="/generate_report" method="post">
       <label for="topic">Enter Report Topic:</label>
       <input type="text" id="topic" name="topic" required placeholder="e.g. GenAI in Healthcare" />
+
+      <label for="max_analysts">Number of Analysts:</label>
+      <input type="number" id="max_analysts" name="max_analysts" value="1" min="1" max="5" required />
+
       <button type="submit">Generate Report</button>
     </form>
   </div>

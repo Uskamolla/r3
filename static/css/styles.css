@@ -1,0 +1,323 @@
+/* ============================================
+   Global Reset & Base Styles
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+a {
+  color: #60a5fa;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #93bbfc;
+  text-decoration: underline;
+}
+
+/* ============================================
+   Auth Pages (Login & Signup)
+   ============================================ */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.auth-card h2 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin-bottom: 28px;
+  color: #f1f5f9;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-card input[type="text"],
+.auth-card input[type="password"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.auth-card input::placeholder {
+  color: #64748b;
+}
+
+.auth-card button {
+  padding: 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  margin-top: 4px;
+}
+
+.auth-card button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+}
+
+.auth-card button:active {
+  transform: translateY(0);
+}
+
+.error {
+  background: #451a2b;
+  color: #fca5a5;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  text-align: center;
+  border: 1px solid #7f1d1d;
+  margin-bottom: 8px;
+}
+
+.switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* ============================================
+   Dashboard Page
+   ============================================ */
+.dashboard-container {
+  max-width: 640px;
+  margin: 80px auto;
+  padding: 0 24px;
+}
+
+.dashboard-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 32px;
+  color: #f1f5f9;
+}
+
+.dashboard-container form {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-container label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.dashboard-container input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  outline: none;
+  margin-bottom: 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-container input[type="text"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.dashboard-container input::placeholder {
+  color: #64748b;
+}
+
+.dashboard-container button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-container button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+}
+
+/* ============================================
+   Report Progress Page
+   ============================================ */
+.report-container {
+  max-width: 700px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.card h2 {
+  font-size: 1.4rem;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  color: #60a5fa;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 0.92rem;
+  margin-bottom: 20px;
+}
+
+.card textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.card textarea::placeholder {
+  color: #64748b;
+}
+
+.card button {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.card button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+}
+
+.note {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Download buttons */
+.downloads {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+  color: white;
+  text-decoration: none;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 500px) {
+  .auth-card {
+    padding: 28px 20px;
+  }
+
+  .dashboard-container {
+    margin: 40px auto;
+  }
+
+  .downloads {
+    flex-direction: column;
+  }
+
+  .download-btn {
+    text-align: center;
+  }
+}
