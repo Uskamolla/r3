@@ -12,7 +12,6 @@ wheels/
 # Virtual environments
 .venv
 agent_env/
-README.md
 
 
 # Claude things

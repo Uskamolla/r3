@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>R3 - Workflow Architecture Diagram</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #f1f5f9;
+    }
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 40px;
+    }
+    .diagram-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ====== FLOW SECTIONS ====== */
+    .flow-section {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ====== NODES ====== */
+    .node {
+      border-radius: 14px;
+      padding: 18px 24px;
+      text-align: center;
+      min-width: 200px;
+      max-width: 280px;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .node:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    .node-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+    .node-desc {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      line-height: 1.4;
+    }
+    .node-icon {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+
+    /* Node Types */
+    .node-start {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: 2px solid #34d399;
+    }
+    .node-llm {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border: 2px solid #60a5fa;
+    }
+    .node-human {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      color: #1e293b;
+      border: 2px solid #fbbf24;
+    }
+    .node-search {
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      color: white;
+      border: 2px solid #a78bfa;
+    }
+    .node-parallel {
+      background: linear-gradient(135deg, #0891b2, #06b6d4);
+      color: white;
+      border: 2px solid #22d3ee;
+    }
+    .node-output {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: white;
+      border: 2px solid #f87171;
+    }
+    .node-end {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: 2px solid #34d399;
+    }
+    .node-sub {
+      background: #1e293b;
+      border: 2px dashed #475569;
+      color: #cbd5e1;
+    }
+
+    /* ====== ARROWS ====== */
+    .arrow {
+      display: flex;
+      justify-content: center;
+      margin: 4px 0;
+    }
+    .arrow svg {
+      width: 30px;
+      height: 30px;
+    }
+    .arrow-text {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.75rem;
+      margin: 2px 0;
+    }
+
+    /* ====== SUB-GRAPH BOX ====== */
+    .subgraph {
+      border: 2px dashed #475569;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 16px auto;
+      max-width: 900px;
+      background: rgba(30, 41, 59, 0.5);
+    }
+    .subgraph-title {
+      text-align: center;
+      font-weight: 700;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .subgraph-note {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ====== PARALLEL BRACKET ====== */
+    .parallel-group {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .parallel-label {
+      text-align: center;
+      color: #22d3ee;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 6px 0;
+      letter-spacing: 0.5px;
+    }
+
+    /* ====== LEGEND ====== */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #94a3b8;
+    }
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    /* ====== APP LAYER ====== */
+    .app-layer {
+      border: 2px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 0 auto 16px;
+      max-width: 500px;
+      background: rgba(30, 41, 59, 0.3);
+    }
+    .app-layer-title {
+      text-align: center;
+      font-weight: 700;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>R3 - Workflow Architecture</h1>
+  <p class="subtitle">Autonomous Research Report Generator | Multi-Agent LangGraph Pipeline</p>
+
+  <div class="diagram-container">
+
+    <!-- ====== APP LAYER ====== -->
+    <div class="app-layer">
+      <div class="app-layer-title">Web Application Layer</div>
+      <div class="flow-section">
+        <div class="node node-sub">
+          <div class="node-icon">🌐</div>
+          <div class="node-title">Browser</div>
+          <div class="node-desc">User enters topic + selects number of analysts</div>
+        </div>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#475569"/><line x1="15" y1="0" x2="15" y2="16" stroke="#475569" stroke-width="2"/></svg></div>
+      <div class="flow-section">
+        <div class="node node-sub">
+          <div class="node-icon">⚡</div>
+          <div class="node-title">FastAPI + ReportService</div>
+          <div class="node-desc">Routes request to LangGraph workflow</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#10b981"/><line x1="15" y1="0" x2="15" y2="16" stroke="#10b981" stroke-width="2"/></svg></div>
+    <div class="arrow-text">Triggers LangGraph Pipeline</div>
+
+    <!-- ====== MAIN GRAPH ====== -->
+    <div class="subgraph">
+      <div class="subgraph-title">LangGraph - Main Research Graph</div>
+
+      <!-- START -->
+      <div class="flow-section">
+        <div class="node node-start">
+          <div class="node-icon">▶️</div>
+          <div class="node-title">START</div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#3b82f6"/><line x1="15" y1="0" x2="15" y2="16" stroke="#3b82f6" stroke-width="2"/></svg></div>
+
+      <!-- CREATE ANALYST -->
+      <div class="flow-section">
+        <div class="node node-llm">
+          <div class="node-icon">🧠</div>
+          <div class="node-title">Create Analysts</div>
+          <div class="node-desc">LLM generates analyst personas with unique perspectives using structured output</div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#f59e0b"/><line x1="15" y1="0" x2="15" y2="16" stroke="#f59e0b" stroke-width="2"/></svg></div>
+
+      <!-- HUMAN FEEDBACK -->
+      <div class="flow-section">
+        <div class="node node-human">
+          <div class="node-icon">👤</div>
+          <div class="node-title">Human Feedback</div>
+          <div class="node-desc">Graph pauses here (interrupt_before). User can refine analyst selection.</div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#8b5cf6"/><line x1="15" y1="0" x2="15" y2="16" stroke="#8b5cf6" stroke-width="2"/></svg></div>
+      <div class="arrow-text">Send() — one per analyst (parallel fan-out)</div>
+
+      <!-- INTERVIEW SUB-GRAPH -->
+      <div class="subgraph" style="border-color: #7c3aed;">
+        <div class="subgraph-title" style="color: #a78bfa;">Interview Sub-Graph (per analyst)</div>
+
+        <div class="flow-section">
+          <div class="node node-llm" style="min-width: 160px;">
+            <div class="node-icon">❓</div>
+            <div class="node-title">Ask Question</div>
+            <div class="node-desc">Analyst asks expert a targeted question</div>
+          </div>
+        </div>
+
+        <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#8b5cf6"/><line x1="15" y1="0" x2="15" y2="16" stroke="#8b5cf6" stroke-width="2"/></svg></div>
+
+        <div class="flow-section">
+          <div class="node node-search" style="min-width: 160px;">
+            <div class="node-icon">🔍</div>
+            <div class="node-title">Search Web</div>
+            <div class="node-desc">Tavily API searches for relevant sources</div>
+          </div>
+        </div>
+
+        <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#3b82f6"/><line x1="15" y1="0" x2="15" y2="16" stroke="#3b82f6" stroke-width="2"/></svg></div>
+
+        <div class="flow-section">
+          <div class="node node-llm" style="min-width: 160px;">
+            <div class="node-icon">💬</div>
+            <div class="node-title">Generate Answer</div>
+            <div class="node-desc">Expert answers using web search context</div>
+          </div>
+        </div>
+
+        <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#3b82f6"/><line x1="15" y1="0" x2="15" y2="16" stroke="#3b82f6" stroke-width="2"/></svg></div>
+
+        <div class="flow-section">
+          <div class="node node-llm" style="min-width: 160px;">
+            <div class="node-icon">💾</div>
+            <div class="node-title">Save Interview</div>
+            <div class="node-desc">Stores full interview transcript</div>
+          </div>
+        </div>
+
+        <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#3b82f6"/><line x1="15" y1="0" x2="15" y2="16" stroke="#3b82f6" stroke-width="2"/></svg></div>
+
+        <div class="flow-section">
+          <div class="node node-llm" style="min-width: 160px;">
+            <div class="node-icon">📝</div>
+            <div class="node-title">Write Section</div>
+            <div class="node-desc">LLM writes a report section from the interview</div>
+          </div>
+        </div>
+
+        <div class="subgraph-note">Runs once for each analyst persona (fan-out with Send())</div>
+      </div>
+
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#06b6d4"/><line x1="15" y1="0" x2="15" y2="16" stroke="#06b6d4" stroke-width="2"/></svg></div>
+      <div class="parallel-label">⚡ PARALLEL EXECUTION</div>
+
+      <!-- PARALLEL NODES -->
+      <div class="parallel-group">
+        <div class="node node-parallel">
+          <div class="node-icon">📄</div>
+          <div class="node-title">Write Report</div>
+          <div class="node-desc">Compiles all sections into unified content</div>
+        </div>
+        <div class="node node-parallel">
+          <div class="node-icon">📖</div>
+          <div class="node-title">Write Introduction</div>
+          <div class="node-desc">Creates a compelling intro for the report</div>
+        </div>
+        <div class="node node-parallel">
+          <div class="node-icon">🔚</div>
+          <div class="node-title">Write Conclusion</div>
+          <div class="node-desc">Summarizes key takeaways</div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#ef4444"/><line x1="15" y1="0" x2="15" y2="16" stroke="#ef4444" stroke-width="2"/></svg></div>
+      <div class="parallel-label">All three must complete before continuing</div>
+
+      <!-- FINALIZE -->
+      <div class="flow-section">
+        <div class="node node-output">
+          <div class="node-icon">📋</div>
+          <div class="node-title">Finalize Report</div>
+          <div class="node-desc">Combines intro + content + conclusion + sources into final report</div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#10b981"/><line x1="15" y1="0" x2="15" y2="16" stroke="#10b981" stroke-width="2"/></svg></div>
+
+      <!-- END -->
+      <div class="flow-section">
+        <div class="node node-end">
+          <div class="node-icon">✅</div>
+          <div class="node-title">END</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 30 30"><polygon points="15,25 10,15 20,15" fill="#10b981"/><line x1="15" y1="0" x2="15" y2="16" stroke="#10b981" stroke-width="2"/></svg></div>
+    <div class="arrow-text">Returns final report to ReportService</div>
+
+    <!-- ====== OUTPUT LAYER ====== -->
+    <div class="app-layer">
+      <div class="app-layer-title">Output Layer</div>
+      <div class="parallel-group">
+        <div class="node node-sub">
+          <div class="node-icon">📄</div>
+          <div class="node-title">DOCX Export</div>
+          <div class="node-desc">python-docx</div>
+        </div>
+        <div class="node node-sub">
+          <div class="node-icon">📕</div>
+          <div class="node-title">PDF Export</div>
+          <div class="node-desc">ReportLab</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== LEGEND ====== -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #3b82f6;"></div>
+        LLM Call
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #f59e0b;"></div>
+        Human Input
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #7c3aed;"></div>
+        Web Search
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #06b6d4;"></div>
+        Parallel Execution
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #ef4444;"></div>
+        Final Output
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #10b981;"></div>
+        Start / End
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
