@@ -188,8 +188,8 @@ class AutonomousReportGenerator:
         
         # Summarize the sections into a final report
         
-        instructions = INTRO_CONCLUSION_INSTRUCTIONS.render(topic=state["topic"], formatted_str_sections=formatted_str_sections)    
-        intro = self.llm.invoke([instructions]+[HumanMessage(content=f"Write the report introduction")]) 
+        instructions = INTRO_CONCLUSION_INSTRUCTIONS.render(topic=state["topic"], formatted_str_sections=formatted_str_sections)
+        intro = self.llm.invoke([SystemMessage(content=instructions)]+[HumanMessage(content=f"Write the report introduction")]) 
         return {"introduction": intro.content}
     
     def write_conclusion(self, state:ResearchGraphState):
