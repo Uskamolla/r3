@@ -19,3 +19,4 @@ notebook/logs
 .env
 langgraph_concepts.md
 logs/
+generated_report
