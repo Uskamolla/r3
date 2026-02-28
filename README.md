@@ -21,57 +21,64 @@ Built with **LangGraph** for multi-agent orchestration and **FastAPI** for the w
 
 ## Architecture
 
-```mermaid
-graph TD
-    A[🌐 Browser] -->|Enter topic + analysts| B[⚡ FastAPI + ReportService]
-    B -->|Triggers pipeline| C[▶️ START]
-
-    subgraph MAIN["🔷 LangGraph - Main Research Graph"]
-        C --> D[🧠 Create Analysts<br/>LLM generates analyst personas]
-        D --> E[👤 Human Feedback<br/>Graph pauses - user can refine]
-        E -->|Send per analyst| F
-
-        subgraph INTERVIEW["🔮 Interview Sub-Graph — runs per analyst"]
-            F[❓ Ask Question] --> G[🔍 Search Web<br/>Tavily API]
-            G --> H[💬 Generate Answer<br/>LLM + web context]
-            H --> I[💾 Save Interview]
-            I --> J[📝 Write Section]
-        end
-
-        J --> K[📄 Write Report]
-        J --> L[📖 Write Introduction]
-        J --> M[🔚 Write Conclusion]
-
-        K --> N[📋 Finalize Report<br/>Intro + Content + Conclusion + Sources]
-        L --> N
-        M --> N
-
-        N --> O[✅ END]
-    end
-
-    O --> P[📄 DOCX Export]
-    O --> Q[📕 PDF Export]
-
-    style MAIN fill:#1e293b,stroke:#334155,stroke-width:2px,color:#e2e8f0
-    style INTERVIEW fill:#1a1a2e,stroke:#7c3aed,stroke-width:2px,stroke-dasharray:5,color:#e2e8f0
-    style D fill:#2563eb,stroke:#60a5fa,color:#fff
-    style E fill:#d97706,stroke:#fbbf24,color:#1e293b
-    style F fill:#2563eb,stroke:#60a5fa,color:#fff
-    style G fill:#7c3aed,stroke:#a78bfa,color:#fff
-    style H fill:#2563eb,stroke:#60a5fa,color:#fff
-    style I fill:#2563eb,stroke:#60a5fa,color:#fff
-    style J fill:#2563eb,stroke:#60a5fa,color:#fff
-    style K fill:#0891b2,stroke:#22d3ee,color:#fff
-    style L fill:#0891b2,stroke:#22d3ee,color:#fff
-    style M fill:#0891b2,stroke:#22d3ee,color:#fff
-    style N fill:#dc2626,stroke:#f87171,color:#fff
-    style C fill:#059669,stroke:#34d399,color:#fff
-    style O fill:#059669,stroke:#34d399,color:#fff
-    style P fill:#1e293b,stroke:#475569,color:#cbd5e1
-    style Q fill:#1e293b,stroke:#475569,color:#cbd5e1
 ```
-
-> 📌 **Interactive version**: Open `static/workflow_diagram.html` in your browser for a detailed visual diagram with hover effects.
+                    ┌──────────────────┐
+                    │     Browser      │ ← Topic + analyst count via POST form
+                    └────────┬─────────┘
+                             │
+                    ┌────────▼─────────┐
+                    │  FastAPI Server   │ ← Auth, routing, session mgmt
+                    │  + ReportService  │ ← Invokes LangGraph StateGraph
+                    └────────┬─────────┘
+                             │
+        ╔════════════════════▼════════════════════╗
+        ║        LangGraph - Research Pipeline     ║
+        ║                                          ║
+        ║   ┌────────────────────┐                 ║
+        ║   │  Create Analysts   │ ← Structured    ║
+        ║   │                    │   LLM output     ║
+        ║   └────────┬───────────┘                 ║
+        ║            │                              ║
+        ║   ┌────────▼───────────┐                 ║
+        ║   │  Human Feedback    │ ← interrupt_     ║
+        ║   │                    │   before node    ║
+        ║   └────────┬───────────┘                 ║
+        ║            │                              ║
+        ║            │  Send() fan-out per analyst   ║
+        ║   ┌────────▼──────────────────────┐      ║
+        ║   │  Interview Sub-Graph          │      ║
+        ║   │                               │      ║
+        ║   │   Ask Question      (LLM)     │      ║
+        ║   │        │                      │      ║
+        ║   │   Search Web     (Tavily API) │      ║
+        ║   │        │                      │      ║
+        ║   │   Generate Answer   (LLM)     │      ║
+        ║   │        │                      │      ║
+        ║   │   Save Interview              │      ║
+        ║   │        │                      │      ║
+        ║   │   Write Section     (LLM)     │      ║
+        ║   └────────┬─────────────────────-┘      ║
+        ║            │                              ║
+        ║     ┌──────┼──────────┐ ← Parallel nodes  ║
+        ║     │      │          │                   ║
+        ║  ┌──▼───┐ ┌▼────┐ ┌──▼──────┐            ║
+        ║  │Report│ │Intro│ │Conclusn │            ║
+        ║  └──┬───┘ └──┬──┘ └──┬──────┘            ║
+        ║     └────────┼────────┘                   ║
+        ║              │                            ║
+        ║   ┌──────────▼─────────┐                  ║
+        ║   │  Finalize Report   │ ← Merge all      ║
+        ║   │                    │   sections        ║
+        ║   └──────────┬────────-┘                  ║
+        ║              │                            ║
+        ╚══════════════╪═══════════════════════════╝
+                       │
+                ┌──────┴──────┐
+                │             │
+           ┌────▼────┐  ┌────▼─────┐
+           │  DOCX   │  │   PDF    │ ← python-docx / ReportLab
+           └─────────┘  └──────────┘
+```
 
 ---
 
