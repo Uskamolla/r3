@@ -6,6 +6,18 @@ Built with **LangGraph** for multi-agent orchestration and **FastAPI** for the w
 
 ---
 
+## Purpose
+
+Researching a topic manually is slow — you read dozens of articles, synthesize different viewpoints, and compile everything into a structured report. R3 automates this entire pipeline using multiple AI agents that work in parallel, each approaching the topic from a different analytical perspective.
+
+Unlike a single LLM prompt that gives you one flat answer, R3 generates **multi-perspective research** by creating specialized analyst personas, conducting independent interviews backed by real-time web search, and merging the results into a publication-ready report.
+
+Currently, R3 uses **web search (Tavily API)** as its primary data source. However, the architecture is designed to be extensible — the interview sub-graph can be expanded to pull from **custom knowledge bases** (vector databases like AstraDB, Pinecone), **document uploads** (PDFs, CSVs via RAG pipelines), **academic sources** (ArXiv, Google Scholar), or **internal databases**, making it adaptable to domain-specific research workflows.
+
+This aligns with the industry shift towards **Agentic RAG** — where agents don't just retrieve and generate in one shot, but plan, reflect, validate sources, and iterate. As enterprise AI moves into a "retrieval-first" era, R3's multi-agent interview pattern provides a foundation that can evolve with these standards.
+
+---
+
 ## Features
 
 - **Multi-Agent Research** - Creates AI analyst personas, each with a unique perspective on the topic
@@ -348,5 +360,72 @@ Each log entry is structured JSON:
   "thread_id": "1bce2bb4-0cf0-4b58-921c-9abfc06eb79b"
 }
 ```
+
+---
+
+## Use Cases
+
+| Domain | Example |
+|--------|---------|
+| **Market Research** | Competitive analysis, industry trend reports, market sizing |
+| **Academic Research** | Literature reviews, topic surveys, multi-source synthesis |
+| **Technology Analysis** | Comparing frameworks, evaluating tools, architecture decisions |
+| **Investment & Due Diligence** | Company research, sector analysis, risk assessment |
+| **Policy & Governance** | Regulatory landscape analysis, policy impact reports |
+| **Healthcare & Biotech** | Drug research summaries, clinical trend analysis |
+| **Internal Knowledge Reports** | Onboarding docs, project retrospectives (with RAG extension) |
+
+---
+
+## Roadmap
+
+R3 currently covers the core research pipeline — multi-agent interviews backed by web search. Below are planned extensions aligned with industry standards in agentic AI and enterprise RAG systems.
+
+### Data Source Extensions
+
+| Extension | Description | Status |
+|-----------|-------------|--------|
+| **RAG Pipeline** | Upload PDFs, CSVs, and docs — agents query a vector store instead of (or alongside) web search | Planned |
+| **Vector DB Integration** | Persistent knowledge base using AstraDB, Pinecone, or Chroma for domain-specific retrieval | Planned |
+| **GraphRAG** | Knowledge graph-based retrieval (Neo4j) for complex, multi-hop queries that need entity relationships, not just similar text | Planned |
+| **Academic Sources** | ArXiv, Google Scholar, PubMed integration for research-grade citations | Planned |
+| **Wikipedia & APIs** | Structured data from Wikipedia, public APIs, and datasets | Planned |
+
+### Agent & Workflow Enhancements
+
+| Enhancement | Description | Status |
+|-------------|-------------|--------|
+| **Hallucination Grader** | Post-generation validation — scores how closely the answer aligns with retrieved context, flags unsupported claims before including in report | Planned |
+| **Query Rewriter** | If retrieved docs are irrelevant, LLM rewrites the search query and retries — following the ReAct (Reason + Act) pattern for grounded retrieval | Planned |
+| **Guardrails Layer** | Input/output validators for PII filtering, format compliance, and policy checks — layered defense so if one check passes a bad output, the next catches it | Planned |
+| **Custom Analyst Personas** | Let users define their own analyst roles and perspectives instead of relying solely on LLM generation | Planned |
+| **Streaming Output (SSE)** | Real-time progress via Server-Sent Events — LangGraph Platform natively supports SSE for monitoring graph execution as it happens | Planned |
+| **Long-Term Agent Memory** | Persistent memory across sessions using MongoDB Store or PostgreSQL — agents remember past research and build on previous findings | Planned |
+| **Report Versioning** | Compare and track changes across multiple report generations on the same topic | Planned |
+| **Verification-Aware Planning** | Encode pass/fail checks per sub-task — agents proceed or halt based on factual validation at each step | Planned |
+
+### Production & Infrastructure
+
+| Upgrade | Description | Status |
+|---------|-------------|--------|
+| **PostgreSQL** | Replace SQLite for concurrent, production-grade storage | Planned |
+| **Redis Sessions / JWT** | Replace in-memory session store with Redis or stateless JWT tokens | Planned |
+| **Persistent Checkpointing** | Replace MemorySaver with database-backed LangGraph checkpointer | Planned |
+| **Docker & CI/CD** | Containerized deployment with automated testing pipeline | Planned |
+| **Observability** | OpenTelemetry / Langfuse tracing for agent execution, latency, and token usage | Planned |
+| **Multi-format Export** | Add Markdown, HTML, and PowerPoint export options | Planned |
+
+---
+
+## Current Limitations
+
+| Limitation | Detail |
+|-----------|--------|
+| **Single data source** | Currently only web search (Tavily) — no internal docs or knowledge base support yet |
+| **Free tier rate limits** | Groq: 12k tokens/min, Google Gemini: 1,500 req/day — limits concurrent analysts |
+| **No persistent memory** | Agent state resets each session (MemorySaver is in-memory only) |
+| **SQLite** | Not suitable for concurrent writes in production environments |
+| **No answer validation** | Generated content is not verified against sources for hallucination |
+| **Single user sessions** | No concurrent report generation for multiple users |
 
 ---
