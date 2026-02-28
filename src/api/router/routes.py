@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
-from research_and_analyst.database.db_config import SessionLocal, User, hash_password, verify_password
-from research_and_analyst.api.services.report_service import ReportService
+from src.database.database_config import SessionLocal, User, hash_password, verify_password
+from src.api.services.report_service import ReportService
 
 # APIRouter groups related endpoints together so they can be registered with the FastAPI app.
 # Example: router.get("/login") will be accessible at http://localhost:8000/login
@@ -38,8 +38,7 @@ async def show_login(request: Request):
 # On failure: re-renders login page with an error message.
 # Example: User submits username="john" and password="secret123"
 @router.post("/login", response_class=HTMLResponse)
-async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    db = next(get_db())
+async def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == username).first()
 
     if user and verify_password(password, user.password):
@@ -69,8 +68,7 @@ async def show_signup(request: Request):
 # On failure: re-renders signup page with an error message.
 # Example: User submits username="jane" and password="mypassword"
 @router.post("/signup", response_class=HTMLResponse)
-async def signup(request: Request, username: str = Form(...), password: str = Form(...)):
-    db = next(get_db())
+async def signup(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.username == username).first()
     if existing_user:
         return request.app.templates.TemplateResponse(
@@ -151,7 +149,7 @@ async def submit_feedback(request: Request, topic: str = Form(...), feedback: st
 # Looks up the file by name and returns it as a downloadable response.
 # Returns an error dict if the file is not found.
 # Example: GET /download/report_ai_in_healthcare.pdf -> downloads the PDF file.
-@router.get("/download/{file_name}", response_class=HTMLResponse)
+@router.get("/download/{file_name}")
 async def download_report(file_name: str):
     service = ReportService()
     file_response = service.download_file(file_name)

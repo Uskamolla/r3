@@ -25,8 +25,6 @@ from src.backend_server.model import (
 )
 
 from src.utils.model_loader import ModelLoader
-
-from src.utils.model_loader import ModelLoader
 from src.prompt_lib.prompt import *
 
 def build_interview_graph(llm,tavily_search=None):
@@ -43,7 +41,7 @@ def build_interview_graph(llm,tavily_search=None):
         messages = state["messages"]
         
         #generate the question
-        system_message = ANALYST_ASK_QUESTIONS.format(goals = analyst.persona)
+        system_message = ANALYST_ASK_QUESTIONS.render(goals = analyst.persona)
         question = llm.invoke([SystemMessage(content=system_message)]+messages)
         
         #returen the question through state
@@ -56,7 +54,7 @@ def build_interview_graph(llm,tavily_search=None):
             state (InterviewState): _description_
         """
         structure_llm = llm.with_structured_output(SearchQuery)
-        search_query = structure_llm.invoke([GENERATE_SEARCH_QUERY]+state["messages"])
+        search_query = structure_llm.invoke([SystemMessage(content=GENERATE_SEARCH_QUERY.render())]+state["messages"])
         
         # Search
         search_docs = tavily_search.invoke(search_query.search_query)
@@ -81,7 +79,7 @@ def build_interview_graph(llm,tavily_search=None):
         context = state["context"]
 
         # Answer question
-        system_message = GENERATE_ANSWERS.format(goals=analyst.persona, context=context)
+        system_message = GENERATE_ANSWERS.render(goals=analyst.persona, context=context)
         answer = llm.invoke([SystemMessage(content=system_message)]+messages)
                 
         # Name the message as coming from the expert
@@ -114,7 +112,7 @@ def build_interview_graph(llm,tavily_search=None):
         analyst = state["analyst"]
     
         # Write section using either the gathered source docs from interview (context) or the interview itself (interview)
-        system_message = WRITE_SECTION.format(focus=analyst.description)
+        system_message = WRITE_SECTION.render(focus=analyst.description)
         section = llm.invoke([SystemMessage(content=system_message)]+[HumanMessage(content=f"Use this source to write your section: {context}")]) 
                     
         # Append it to state
@@ -154,7 +152,7 @@ class AutonomousReportGenerator:
         
         structured_llm = self.llm.with_structured_output(Perspectives)
         
-        system_messages = CREATE_ANALYSTS_PROMPT.format(
+        system_messages = CREATE_ANALYSTS_PROMPT.render(
             topic=topic,
             max_analysts=max_analysts,
             human_analyst_feedback=human_analyst_feedback
@@ -190,7 +188,7 @@ class AutonomousReportGenerator:
         
         # Summarize the sections into a final report
         
-        instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=state["topic"], formatted_str_sections=formatted_str_sections)    
+        instructions = INTRO_CONCLUSION_INSTRUCTIONS.render(topic=state["topic"], formatted_str_sections=formatted_str_sections)    
         intro = self.llm.invoke([instructions]+[HumanMessage(content=f"Write the report introduction")]) 
         return {"introduction": intro.content}
     
@@ -205,7 +203,7 @@ class AutonomousReportGenerator:
         
         # Summarize the sections into a final report
         
-        instructions = INTRO_CONCLUSION_INSTRUCTIONS.format(topic=topic, formatted_str_sections=formatted_str_sections)    
+        instructions = INTRO_CONCLUSION_INSTRUCTIONS.render(topic=topic, formatted_str_sections=formatted_str_sections)    
         conclusion = self.llm.invoke([instructions]+[HumanMessage(content=f"Write the report conclusion")]) 
         return {"conclusion": conclusion.content}
     

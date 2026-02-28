@@ -1,10 +1,10 @@
 import uuid
 import os
 from fastapi.responses import FileResponse
-from research_and_analyst.utils.model_loader import ModelLoader
-from research_and_analyst.workflows.report_generator_workflow import AutonomousReportGenerator
-from research_and_analyst.logger import GLOBAL_LOGGER
-from research_and_analyst.exception.custom_exception import ResearchAnalystException
+from src.utils.model_loader import ModelLoader
+from src.backend_server.workflow import AutonomousReportGenerator
+from src.logger import GLOBAL_LOGGER
+from src.exception.custom_exception import ResearchAnalystException
 from langgraph.checkpoint.memory import MemorySaver
 
 _shared_memory = MemorySaver()
